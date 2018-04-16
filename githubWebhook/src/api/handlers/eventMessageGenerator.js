@@ -9,7 +9,7 @@ module.exports = () => {
   //Create : either repo, branch or tag
   const onCreate = (payload, eventData) => {
     if (payload.ref_type == 'branch') {
-      const branchUrl = eventData.repoUrl + '/' + payload.ref;
+      const branchUrl = eventData.repoUrl + '/tree/' + payload.ref;
       return `[<${eventData.repoUrl}|${eventData.repoName}>] New branch "<${branchUrl}|${
         payload.ref
       }>" was pushed by <${eventData.userUrl}|${eventData.userName}>`;
@@ -29,7 +29,7 @@ module.exports = () => {
       }|${eventData.userName}>`;
     }
     if (payload.ref_type == 'branch') {
-      const branchUrl = eventData.repoUrl + '/' + payload.ref;
+      const branchUrl = eventData.repoUrl + '/tree/' + payload.ref;
       return `[<${eventData.repoUrl}|${eventData.repoName}>] The branch <${branchUrl}|${
         payload.ref
       } was deleted by <${eventData.userUrl}|${eventData.userName}>`;
@@ -74,20 +74,20 @@ module.exports = () => {
   const onIssueComment = (payload, eventData) => {
     return `[<${eventData.repoUrl}|${eventData.repoName}>] An issue comment was ${
       payload.action
-    } by <${eventData.userUrl}|${eventData.userName}> on issue <${payload.issue.url}|${
+    } by <${eventData.userUrl}|${eventData.userName}> on issue <${payload.issue.html_url}|${
       payload.issue.id
     }>`;
   };
   //On issue assigned, unassigned, unlabled, opened, edited, milestoned,
   //demilestoned, closed or reopened
   const onIssue = (payload, eventData) => {
-    return `[<${eventData.repoUrl}|${eventData.repoName}> The issue "<${payload.issue.url}|${
+    return `[<${eventData.repoUrl}|${eventData.repoName}> The issue "<${payload.issue.html_url}|${
       payload.issue.title
     }>" has been set to ${payload.action} by <${eventData.userUrl}|${eventData.userName}>"]`;
   };
   //On label create, edited or deleted
   const onLabel = (payload, eventData) => {
-    return `[<${eventData.repoUrl}|${eventData.repoName}>] Label <${payload.label.url}|${
+    return `[<${eventData.repoUrl}|${eventData.repoName}>] Label <${payload.label.html_url}|${
       payload.label.name
     }> has been ${payload.action}`;
   };
@@ -97,7 +97,7 @@ module.exports = () => {
   };
   //On member added, removed, or perm change to a repo
   const onMember = (payload, eventData) => {
-    return `[<${eventData.repoUrl}|${eventData.repoName}>] The member <${payload.member.url}|${
+    return `[<${eventData.repoUrl}|${eventData.repoName}>] The member <${payload.member.html_url}|${
       payload.member.login
     }> has been ${payload.action} as a collaborator to the repository by <${eventData.userUrl}|${
       eventData.userName
@@ -105,43 +105,48 @@ module.exports = () => {
   };
   //On add or remove from team
   const onMembership = (payload, eventData) => {
-    return `<${payload.member.url}|${payload.member.login}> has been ${
+    return `<${payload.member.html_url}|${payload.member.login}> has been ${
       payload.action
-    } to the team <${payload.team.url}|${payload.team.name}> by <${eventData.userUrl}|${
+    } to the team <${payload.team.html_url}|${payload.team.name}> by <${eventData.userUrl}|${
       eventData.userName
     }>`;
   };
   //On milestone create, open, edit, delete
   const onMilestone = (payload, eventData) => {
-    return `[<${eventData.repoUrl}|${eventData.repoName}>] Milestone <${payload.milestone.url}|${
-      payload.milestone.title
-    }> was ${payload.action} by <${eventData.userUrl}|${eventData.userName}>`;
+    return `[<${eventData.repoUrl}|${eventData.repoName}>] Milestone <${
+      payload.milestone.html_url
+    }|${payload.milestone.title}> was ${payload.action} by <${eventData.userUrl}|${
+      eventData.userName
+    }>`;
   };
   //On user add / rm / invited in orga
   const onOrganization = (payload, eventData) => {
-    const message = `<${payload.organization.url}|${payload.organization.login}> by <${
+    const message = `<${payload.organization.html_url}|${payload.organization.login}> by <${
       eventData.userUrl
     }|${eventData.userName}>`;
     if (payload.action == 'member_invited')
       return (
-        `<${payload.invitation.url}|${payload.invitation.login}> has been invited to join ` +
+        `<${payload.invitation.html_url}|${payload.invitation.login}> has been invited to join ` +
         message
       );
     if (payload.action == 'member_added')
-      return `<${payload.membership.url}|${payload.membership.login}> has been added to ` + message;
+      return (
+        `<${payload.membership.html_url}|${payload.membership.login}> has been added to ` + message
+      );
     if (payload.action == 'member_removed')
       return (
-        `<${payload.membership.url}|${payload.membership.login}> has been removed from ` + message
+        `<${payload.membership.html_url}|${payload.membership.login}> has been removed from ` +
+        message
       );
     return message;
   };
   //On user block/unblock by orga
   const onOrgBlock = (payload, eventData) => {
-    return `<${payload.blocked_user.url}|${payload.blocked_user.login}> was ${
+    return `<${payload.blocked_user.html_url}|${payload.blocked_user.login}> was ${
       payload.action
-    } from <${payload.organization.url}|${payload.organization.login}> by <${eventData.userUrl}|${
-      eventData.userName
-    }>`;
+    } from <${payload.organization.html_url}|${payload.organization.login}> by <${
+      eventData.userUrl
+    }|${eventData.userName}>`;
   };
   //On attempted page build
   const onPageBuild = (payload, eventData) => {
@@ -158,16 +163,18 @@ module.exports = () => {
   //On create/update/move/delete project column
   const onProjectColumn = (payload, eventData) => {
     return `[<${eventData.repoUrl}|${eventData.repoName}>] The project column <${
-      payload.project_column.url
+      payload.project_column.html_url
     }|${payload.project_column.name}> was ${payload.action} by <${eventData.userUrl}|${
       eventData.userName
     }>`;
   };
   //On create/update/close/reopen/delete project
   const onProject = (payload, eventData) => {
-    return `[<${eventData.repoUrl}|${eventData.repoName}>] The project <${payload.project.url}|${
-      payload.project.name
-    }> was ${payload.action} by <${eventData.userUrl}|${eventData.userName}>`;
+    return `[<${eventData.repoUrl}|${eventData.repoName}>] The project <${
+      payload.project.html_url
+    }|${payload.project.name}> was ${payload.action} by <${eventData.userUrl}|${
+      eventData.userName
+    }>`;
   };
   //On change from private repo to open source
   const onPublic = (payload, eventData) => {
@@ -179,7 +186,7 @@ module.exports = () => {
     if (payload.action === 'opened')
       return `[<${eventData.repoUrl}|${eventData.repoName}>] Pull request submitted by <${
         eventData.userUrl
-      }|${eventData.userName}> <${payload.pull_request.url}|${payload.pull_request.title}>`;
+      }|${eventData.userName}> <${payload.pull_request.html_url}|${payload.pull_request.title}>`;
     if (payload.action === 'closed')
       return `[<${eventData.repoUrl}|${eventData.repoName}>] Pull request ${payload.action}: <${
         payload.pull_request.title
@@ -190,24 +197,26 @@ module.exports = () => {
       if (payload.review.state === 'approved')
         return `[<${eventData.repoUrl}|${eventData.repoName}>] <${eventData.userUrl}|${
           eventData.userName
-        }> approved <${payload.pull_request.url}|${payload.pull_request.title}>`;
+        }> approved <${payload.pull_request.html_url}|${payload.pull_request.title}>`;
       if (payload.review.state === 'changes_requested')
         return `[<${eventData.repoUrl}|${eventData.repoName}>] <${eventData.userUrl}|${
           eventData.userName
-        }> requested changes to <${payload.pull_request.url}|${payload.pull_request.title}>`;
+        }> requested changes to <${payload.pull_request.html_url}|${payload.pull_request.title}>`;
       if (payload.review.state === 'commented')
         return `[<${eventData.repoUrl}|${eventData.repoName}>] <${eventData.userUrl}|${
           eventData.userName
-        }> commented on <${payload.pull_request.url}|${payload.pull_request.title}>`;
+        }> commented on <${payload.pull_request.html_url}|${payload.pull_request.title}>`;
     }
-    return `[<${eventData.repoUrl}|${eventData.repoName}>] Review on <${payload.pull_request.url}|${
-      payload.pull_request.title
-    }> was ${payload.action} by <${eventData.userUrl}|${eventData.userName}>`;
+    return `[<${eventData.repoUrl}|${eventData.repoName}>] Review on <${
+      payload.pull_request.html_url
+    }|${payload.pull_request.title}> was ${payload.action} by <${eventData.userUrl}|${
+      eventData.userName
+    }>`;
   };
   const onPullRequestReviewComment = (payload, eventData) => {
     return `[<${eventData.repoUrl}|${eventData.repoName}>] <${eventData.userUrl}|${
       eventData.userName
-    }> ${payload.action} a comment on pull request <${payload.pull_request.url}|${
+    }> ${payload.action} a comment on pull request <${payload.pull_request.html_url}|${
       payload.pull_request.title
     }>`;
   };
@@ -231,17 +240,19 @@ module.exports = () => {
   const onStatus = (payload, eventData) => {
     return `[<${eventData.repoUrl}|${eventData.repoName}>] <${eventData.userUrl}|${
       eventData.userName
-    }> changed commit <${payload.commit.url}|${payload.description}> status to ${payload.state}`;
+    }> changed commit <${payload.commit.html_url}|${payload.description}> status to ${
+      payload.state
+    }`;
   };
   //On orga team create/delete
   const onTeam = (payload, eventData) => {
-    return `Team <${payload.team.url}|${payload.team.name}> was ${payload.action} by <${
+    return `Team <${payload.team.html_url}|${payload.team.name}> was ${payload.action} by <${
       eventData.userUrl
     }|${eventData.userName}>`;
   };
   //On repo added to team
   const onTeamAdd = (payload, eventData) => {
-    return `[<${eventData.repoUrl}|${eventData.repoName}>] was added to <${payload.team.url}|${
+    return `[<${eventData.repoUrl}|${eventData.repoName}>] was added to <${payload.team.html_url}|${
       payload.team.name
     }> by <${eventData.userUrl}|${eventData.userName}>`;
   };
@@ -297,9 +308,9 @@ module.exports = () => {
       const payload = JSON.parse(JSONPayload);
       const message = generator[0].generator(payload, {
         userName: payload.sender.login,
-        userUrl: payload.sender.url,
+        userUrl: payload.sender.html_url,
         repoName: payload.repository ? payload.repository.name : undefined,
-        repoUrl: payload.repository ? payload.repository.url : undefined
+        repoUrl: payload.repository ? payload.repository.html_url : undefined
       });
       return message;
     }

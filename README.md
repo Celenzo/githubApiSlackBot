@@ -4,7 +4,7 @@ Making a slack bot posting github events
 
 Use : 
 
-> Github Webhook : node server.js, and set the link as organization webhook
+> Github Webhook : node server.js, and set the link as organization webhook (ngrok)
 
 > Slack bot : NOT IMPLEMENTED
 
@@ -26,6 +26,6 @@ GITHUB WEBHOOK
 SLACK BOT
 ---------------------
 	Create BOT				OK
+	Set AMQP consume			OK
 	Post Message
-	Set AMQP consume
 	Format Messages

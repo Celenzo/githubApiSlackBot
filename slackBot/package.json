@@ -1,0 +1,19 @@
+{
+  "name": "slackbot",
+  "version": "1.0.0",
+  "description": "slackbot for github log",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "crespi_c",
+  "license": "ISC",
+  "dependencies": {
+    "amqplib": "^0.5.2",
+    "common-env": "^6.1.0",
+    "hapi": "^17.3.1",
+    "hapi-swagger": "^9.1.1",
+    "inert": "^5.1.0",
+    "vision": "^5.3.2"
+  }
+}

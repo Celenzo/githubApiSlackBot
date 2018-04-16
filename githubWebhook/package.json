@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/Celenzo/githubApiTests#readme",
   "dependencies": {
+    "amqplib": "^0.5.2",
     "common-env": "^6.1.0",
     "hapi": "^17.3.1",
     "hapi-swagger": "^9.1.1",

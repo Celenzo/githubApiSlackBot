@@ -13,7 +13,7 @@ Use :
 TODO:
 ---------------------
 
-HANDLERS API GITHUB
+GITHUB WEBHOOK
 ---------------------
 	Better pull request handling		OK
 	Better pull request review handling 	OK
@@ -21,11 +21,11 @@ HANDLERS API GITHUB
 	Better onTeam handling 			OK
 	Return the result 			OK
 	Set message with slack format
-	Set AMQP publish
+	Set AMQP publish			OK
 ---------------------
-API SLACK
+SLACK BOT
 ---------------------
-	Create BOT
+	Create BOT				OK
 	Post Message
 	Set AMQP consume
 	Format Messages

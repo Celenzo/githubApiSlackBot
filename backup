@@ -1,0 +1,20 @@
+'use strict';
+
+module.exports = messageGenerator => {
+  return {
+    postmeth(req, res) {
+	console.log(req);
+      const generator = messageGenerator.filter((event) => { 
+	  return event.eventName == (req.headers.x-github-event);
+      });
+      if (!generator) {
+	  return '';
+      }
+      generator[0].generator(payload);
+      return '';
+    },
+    getmeth(req, res) {
+      return 'test';
+    }
+  };
+};

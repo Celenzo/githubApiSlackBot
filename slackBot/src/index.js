@@ -1,6 +1,6 @@
 'use strict';
 
-module.exports = (server, config) => {
+module.exports = config => {
   return require('./services')(config).then(services => {
     require('./api')(config, services);
   });

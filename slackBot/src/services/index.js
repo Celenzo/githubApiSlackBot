@@ -3,7 +3,8 @@
 module.exports = (config, handlers) => {
   return require('./AMQPService')(config, handlers).then(AMQPService => {
     return {
-      AMQPService
+      AMQPService,
+      SlackService: require('./SlackService')(config)
     };
   });
 };

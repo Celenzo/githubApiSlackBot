@@ -1,7 +1,7 @@
 'use strict';
 
-module.exports = config => {
+module.exports = (config, services) => {
   return {
-    github: require('./handlers')(config)
+    github: require('./handlers')(config, services)
   };
 };

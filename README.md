@@ -27,5 +27,5 @@ SLACK BOT
 ---------------------
 	Create BOT				OK
 	Set AMQP consume			OK
-	Post Message
+	Post Message				OK
 	Format Messages

@@ -1,4 +1,4 @@
-# Testing Github API
+# Github Slack Bot
 
 Making a slack bot posting github events
 

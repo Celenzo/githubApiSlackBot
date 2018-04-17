@@ -39,7 +39,7 @@ Use :
 - [x] Set small text link
 - [x] Display only the new comment on review
 - [x] Fix position in small text
-- [x] Refactor HELLFILE
+- [ ] Refactor HELLFILE
 ---------------------
 
 ### SLACK BOT

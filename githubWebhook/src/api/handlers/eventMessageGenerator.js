@@ -1,25 +1,6 @@
 'use strict';
 
-/*
-HHHHHHHHH     HHHHHHHHHEEEEEEEEEEEEEEEEEEEEEELLLLLLLLLLL             LLLLLLLLLLL             
-H:::::::H     H:::::::HE::::::::::::::::::::EL:::::::::L             L:::::::::L             
-H:::::::H     H:::::::HE::::::::::::::::::::EL:::::::::L             L:::::::::L             
-HH::::::H     H::::::HHEE::::::EEEEEEEEE::::ELL:::::::LL             LL:::::::LL             
-  H:::::H     H:::::H    E:::::E       EEEEEE  L:::::L                 L:::::L               
-  H:::::H     H:::::H    E:::::E               L:::::L                 L:::::L               
-  H::::::HHHHH::::::H    E::::::EEEEEEEEEE     L:::::L                 L:::::L               
-  H:::::::::::::::::H    E:::::::::::::::E     L:::::L                 L:::::L               
-  H:::::::::::::::::H    E:::::::::::::::E     L:::::L                 L:::::L               
-  H::::::HHHHH::::::H    E::::::EEEEEEEEEE     L:::::L                 L:::::L               
-  H:::::H     H:::::H    E:::::E               L:::::L                 L:::::L               
-  H:::::H     H:::::H    E:::::E       EEEEEE  L:::::L         LLLLLL  L:::::L         LLLLLL
-HH::::::H     H::::::HHEE::::::EEEEEEEE:::::ELL:::::::LLLLLLLLL:::::LLL:::::::LLLLLLLLL:::::L
-H:::::::H     H:::::::HE::::::::::::::::::::EL::::::::::::::::::::::LL::::::::::::::::::::::L
-H:::::::H     H:::::::HE::::::::::::::::::::EL::::::::::::::::::::::LL::::::::::::::::::::::L
-HHHHHHHHH     HHHHHHHHHEEEEEEEEEEEEEEEEEEEEEELLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL
-*/
-
-module.exports = ({ PlatformService }, config) => {
+module.exports = ({ slackCommentsBlockBuilder }) => {
   const onCommitComment = (payload, eventData) => {
     return `[<${eventData.repoUrl}|${eventData.repoName}>] <${eventData.userUrl}|${
       eventData.userName
@@ -250,29 +231,7 @@ module.exports = ({ PlatformService }, config) => {
           }
         ]
       };
-  };
-  const slackFormatCommentsBuilder = async (payload, color) => {
-    return await PlatformService.promiseOnGetUrl(payload.pull_request.review_comments_url, {
-      'User-Agent': config.github.userAgent
-    })
-      .then(res => {
-        const mappedArr = JSON.parse(res).map(elem => {
-          return {
-            text: elem.body,
-            color,
-            footer: 'Commented by ${payload.sender.login} on line ${res.position} of ${res.path}'
-          };
-        });
-        if (mappedArr.length > 5) {
-          return mappedArr.slice(0, 5).concat({
-            text: `<${payload.review.html_url}|View all ${mappedArr.length} comments on Github>`,
-            color
-          });
-          return redirArr;
-        }
-        return mappedArr;
-      })
-      .catch(err => err);
+    return ``;
   };
   const onPullRequestReview = async (payload, eventData) => {
     if (payload.action === 'submitted') {
@@ -281,21 +240,21 @@ module.exports = ({ PlatformService }, config) => {
           text: `[<${eventData.repoUrl}|${eventData.repoName}>] <${eventData.userUrl}|${
             eventData.userName
           }> approved <${payload.pull_request.html_url}|${payload.pull_request.title}>`,
-          attachments: await slackFormatCommentsBuilder(payload, '#6cc644')
+          attachments: await slackCommentsBlockBuilder(payload, '#6cc644')
         };
       if (payload.review.state === 'changes_requested')
         return {
           text: `[<${eventData.repoUrl}|${eventData.repoName}>] <${eventData.userUrl}|${
             eventData.userName
           }> requested changes to <${payload.pull_request.html_url}|${payload.pull_request.title}>`,
-          attachments: await slackFormatCommentsBuilder(payload, '#fad5a1')
+          attachments: await slackCommentsBlockBuilder(payload, '#fad5a1')
         };
       if (payload.review.state === 'commented')
         return {
           text: `[<${eventData.repoUrl}|${eventData.repoName}>] <${eventData.userUrl}|${
             eventData.userName
           }> commented on <${payload.pull_request.html_url}|${payload.pull_request.title}>`,
-          attachments: await slackFormatCommentsBuilder(payload, '#c4e8b4')
+          attachments: await slackCommentsBlockBuilder(payload, '#c4e8b4')
         };
     }
     return `[<${eventData.repoUrl}|${eventData.repoName}>] Review on <${
@@ -393,7 +352,7 @@ module.exports = ({ PlatformService }, config) => {
   return {
     async generate(headers, JSONPayload) {
       const generator = generators.filter(event => event.eventName == headers['x-github-event']);
-      if (!generator) {
+      if (!generator || generator.length == 0) {
         return '';
       }
       const payload = JSON.parse(JSONPayload);

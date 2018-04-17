@@ -30,7 +30,7 @@ GITHUB WEBHOOK
 	Set message with slack format		OK
 	Set AMQP publish			OK
 	Set Slack attachments			OK
-	Set small text (commented by...)
+	Set small text (commented by...)	OK
 	Display only the new comment on review
 ---------------------
 SLACK BOT

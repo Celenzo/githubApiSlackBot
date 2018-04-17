@@ -21,27 +21,31 @@ Use :
 
 
 ##TODO:
+
 ---------------------
 
 ###GITHUB WEBHOOK
+
 ---------------------
-	Better pull request handling		[x]
-	Better pull request review handling 	[x]
-	Better onInstallRepo handling 		[x]
-	Better onTeam handling 			[x]
-	Return the result 			[x]
-	Set message with slack format		[x]
-	Set AMQP publish			[x]
-	Set Slack attachments			[x]
-	Set small text (commented by...)	[x]
-	    Set small text link			[x]
-	Display only the new comment on review	[x]
-	Fix position in small text   		[x]
-	Refactor HELLFILE
+- Better pull request handling			[x]
+- Better pull request review handling 		[x]
+- Better onInstallRepo handling 		[x]
+- Better onTeam handling 			[x]
+- Return the result 				[x]
+- Set message with slack format			[x]
+- Set AMQP publish				[x]
+- Set Slack attachments				[x]
+- Set small text (commented by...)		[x]
+    - Set small text link			[x]
+- Display only the new comment on review	[x]
+- Fix position in small text   			[x]
+- Refactor HELLFILE
 ---------------------
+
 ###SLACK BOT
+
 ---------------------
-	Create BOT				[x]
-	Set AMQP consume			[x]
-	Post Message				[x]
-	Format Messages				[x]
+- Create BOT					[x]
+- Set AMQP consume				[x]
+- Post Message					[x]
+- Format Messages				[x]

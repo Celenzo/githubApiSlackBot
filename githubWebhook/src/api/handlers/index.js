@@ -1,7 +1,7 @@
 'use strict';
 
-module.exports = services => {
-  const generators = require('./eventMessageGenerator')();
+module.exports = (services, config) => {
+  const generators = require('./eventMessageGenerator')(services, config);
   return {
     github: require('./handlers')(generators, services)
   };

@@ -1,6 +1,6 @@
 'use strict';
 
-module.exports = () => {
+module.exports = ({ PlatformService }, config) => {
   const onCommitComment = (payload, eventData) => {
     return `[<${eventData.repoUrl}|${eventData.repoName}>] <${eventData.userUrl}|${
       eventData.userName
@@ -10,9 +10,16 @@ module.exports = () => {
   const onCreate = (payload, eventData) => {
     if (payload.ref_type == 'branch') {
       const branchUrl = eventData.repoUrl + '/tree/' + payload.ref;
-      return `[<${eventData.repoUrl}|${eventData.repoName}>] New branch "<${branchUrl}|${
-        payload.ref
-      }>" was pushed by <${eventData.userUrl}|${eventData.userName}>`;
+      return {
+        attachments: [
+          {
+            text: `[<${eventData.repoUrl}|${eventData.repoName}>] New branch "<${branchUrl}|${
+              payload.ref
+            }>" was pushed by <${eventData.userUrl}|${eventData.userName}>`,
+            color: '#4183c4'
+          }
+        ]
+      };
     }
     if (payload.ref_type == 'tag') {
       return `[<${eventData.repoUrl}|${eventData.repoName}>] New tag *${
@@ -24,9 +31,16 @@ module.exports = () => {
   //Delete : either branch or tag
   const onDelete = (payload, eventData) => {
     if (payload.ref_type == 'tag') {
-      return `[<${eventData.repoUrl}|${eventData.repoName}>] Tag *${payload.ref}* was deleted by <${
-        eventData.userUrl
-      }|${eventData.userName}>`;
+      return {
+        attachments: [
+          {
+            text: `[<${eventData.repoUrl}|${eventData.repoName}>] Tag *${
+              payload.ref
+            }* was deleted by <${eventData.userUrl}|${eventData.userName}>`,
+            color: '#4183c4'
+          }
+        ]
+      };
     }
     if (payload.ref_type == 'branch') {
       const branchUrl = eventData.repoUrl + '/tree/' + payload.ref;
@@ -81,9 +95,18 @@ module.exports = () => {
   //On issue assigned, unassigned, unlabled, opened, edited, milestoned,
   //demilestoned, closed or reopened
   const onIssue = (payload, eventData) => {
-    return `[<${eventData.repoUrl}|${eventData.repoName}> The issue "<${payload.issue.html_url}|${
-      payload.issue.title
-    }>" has been set to ${payload.action} by <${eventData.userUrl}|${eventData.userName}>"]`;
+    return {
+      attachments: [
+        {
+          text: `[<${eventData.repoUrl}|${eventData.repoName}> The issue "<${
+            payload.issue.html_url
+          }|${payload.issue.title}>" has been set to ${payload.action} by <${eventData.userUrl}|${
+            eventData.userName
+          }>"]`,
+          color: '#e3e4e6'
+        }
+      ]
+    };
   };
   //On label create, edited or deleted
   const onLabel = (payload, eventData) => {
@@ -184,28 +207,86 @@ module.exports = () => {
     //*Missing handling for actions : 'assigned' / 'unassigned' / 'review_requested' /
     //'review_request_removed', 'labeled', 'unlabeled', 'edited', 'reopened'
     if (payload.action === 'opened')
-      return `[<${eventData.repoUrl}|${eventData.repoName}>] Pull request submitted by <${
-        eventData.userUrl
-      }|${eventData.userName}> <${payload.pull_request.html_url}|${payload.pull_request.title}>`;
+      return {
+        text: `[<${eventData.repoUrl}|${eventData.repoName}>] Pull request submitted by <${
+          eventData.userUrl
+        }|${eventData.userName}>`,
+        attachments: [
+          {
+            text: `<${payload.pull_request.html_url}|${payload.pull_request.title}>`,
+            color: '#6cc644'
+          }
+        ]
+      };
     if (payload.action === 'closed')
-      return `[<${eventData.repoUrl}|${eventData.repoName}>] Pull request ${payload.action}: <${
-        payload.pull_request.title
-      }|${payload.pull_request.title}> by <${eventData.userUrl}|${eventData.userName}>`;
+      return {
+        attachments: [
+          {
+            text: `[<${eventData.repoUrl}|${eventData.repoName}>] Pull request ${
+              payload.action
+            }: <${payload.pull_request.title}|${payload.pull_request.title}> by <${
+              eventData.userUrl
+            }|${eventData.userName}>`,
+            color: '#e3e4e6'
+          }
+        ]
+      };
   };
-  const onPullRequestReview = (payload, eventData) => {
+  const slackFormatCommentsBuilder = async (url, reviewHtmlUrl, color) => {
+    return await PlatformService.promiseOnGetUrl(url, { 'User-Agent': config.github.userAgent })
+      .then(res => {
+        const mappedArr = JSON.parse(res).map(elem => {
+          return {
+            text: elem.body,
+            color
+          };
+        });
+        if (mappedArr.length > 5) {
+          return mappedArr.slice(0, 5).concat({
+            text: `<${reviewHtmlUrl}|View all ${mappedArr.length} comments on Github>`,
+            color
+          });
+          return redirArr;
+        }
+        return mappedArr;
+      })
+      .catch(err => err);
+  };
+  const onPullRequestReview = async (payload, eventData) => {
     if (payload.action === 'submitted') {
       if (payload.review.state === 'approved')
-        return `[<${eventData.repoUrl}|${eventData.repoName}>] <${eventData.userUrl}|${
-          eventData.userName
-        }> approved <${payload.pull_request.html_url}|${payload.pull_request.title}>`;
+        return {
+          text: `[<${eventData.repoUrl}|${eventData.repoName}>] <${eventData.userUrl}|${
+            eventData.userName
+          }> approved <${payload.pull_request.html_url}|${payload.pull_request.title}>`,
+          attachments: await slackFormatCommentsBuilder(
+            payload.pull_request.review_comments_url,
+            payload.review.html_url,
+            '#6cc644'
+          )
+        };
       if (payload.review.state === 'changes_requested')
-        return `[<${eventData.repoUrl}|${eventData.repoName}>] <${eventData.userUrl}|${
-          eventData.userName
-        }> requested changes to <${payload.pull_request.html_url}|${payload.pull_request.title}>`;
+        return {
+          text: `[<${eventData.repoUrl}|${eventData.repoName}>] <${eventData.userUrl}|${
+            eventData.userName
+          }> requested changes to <${payload.pull_request.html_url}|${payload.pull_request.title}>`,
+          attachments: await slackFormatCommentsBuilder(
+            payload.pull_request.review_comments_url,
+            payload.review.html_url,
+            '#fad5a1'
+          )
+        };
       if (payload.review.state === 'commented')
-        return `[<${eventData.repoUrl}|${eventData.repoName}>] <${eventData.userUrl}|${
-          eventData.userName
-        }> commented on <${payload.pull_request.html_url}|${payload.pull_request.title}>`;
+        return {
+          text: `[<${eventData.repoUrl}|${eventData.repoName}>] <${eventData.userUrl}|${
+            eventData.userName
+          }> commented on <${payload.pull_request.html_url}|${payload.pull_request.title}>`,
+          attachments: await slackFormatCommentsBuilder(
+            payload.pull_request.review_comments_url,
+            payload.review.html_url,
+            '#c4e8b4'
+          )
+        };
     }
     return `[<${eventData.repoUrl}|${eventData.repoName}>] Review on <${
       payload.pull_request.html_url
@@ -214,9 +295,9 @@ module.exports = () => {
     }>`;
   };
   const onPullRequestReviewComment = (payload, eventData) => {
-    return `[<${eventData.repoUrl}|${eventData.repoName}>] <${eventData.userUrl}|${
+    return `[<${eventData.repoUrl}|${eventData.repoName}>] New comment by <${eventData.userUrl}|${
       eventData.userName
-    }> ${payload.action} a comment on pull request <${payload.pull_request.html_url}|${
+    }> ${payload.action} on pull request <${payload.pull_request.html_url}|${
       payload.pull_request.title
     }>`;
   };
@@ -300,13 +381,13 @@ module.exports = () => {
   ];
 
   return {
-    generate(headers, JSONPayload) {
+    async generate(headers, JSONPayload) {
       const generator = generators.filter(event => event.eventName == headers['x-github-event']);
       if (!generator) {
         return '';
       }
       const payload = JSON.parse(JSONPayload);
-      const message = generator[0].generator(payload, {
+      const message = await generator[0].generator(payload, {
         userName: payload.sender.login,
         userUrl: payload.sender.html_url,
         repoName: payload.repository ? payload.repository.name : undefined,

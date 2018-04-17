@@ -3,7 +3,8 @@
 module.exports = config => {
   return require('./AMQPService')(config).then(AMQPService => {
     return {
-      AMQPService
+      AMQPService,
+      PlatformService: require('./platform')()
     };
   });
 };

@@ -11,6 +11,9 @@ module.exports = () => {
         name: 'exchange',
         type: 'direct'
       }
+    },
+    github: {
+      userAgent: ''
     }
   });
 };

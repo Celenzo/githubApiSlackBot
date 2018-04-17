@@ -6,12 +6,12 @@ Use :
 
 > sudo rabbitmq-server
 
-> Github Webhook : 
+> Github Webhook :
   ```
   node server.js & && ngrok http 4567
   ```
-  Set the link as organization webhook on github <br />
-  The Webhook will get all events and send them in a queue
+>  Set the link as organization webhook on github <br />
+   The Webhook will get all events and send them in a queue
 
 > Slack bot : Create a slack app and get the incoming webhook token <br />
   Put the token in slackBot/config.js (in slack.token) <br />

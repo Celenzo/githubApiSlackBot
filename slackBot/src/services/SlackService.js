@@ -10,7 +10,7 @@ module.exports = config => {
 
   return {
     async postMessage(message) {
-      slack.notify(message)
+      slack.notify(message);
     }
   };
 };
